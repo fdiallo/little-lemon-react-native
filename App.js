@@ -9,6 +9,7 @@ import Profile from './screens/Profile';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SplashScreen from './screens/SplashScreen';
 import OnboardingHeader from './screens/OnboardingHeader';
+import Home from './screens/Home';
 
 const Stack = createNativeStackNavigator();
 const REGISTRATION_STATUS_KEY = 'isRegistered';
@@ -19,25 +20,22 @@ export default function App() {
 
   useEffect(() => {
     retrievedRegistrationStatus();
-
   }, []);
 
   const retrievedRegistrationStatus = async () => {
     setLoading(true)
-    try { 
+    try {
       setTimeout(async () => {
         const value = await AsyncStorage.getItem(REGISTRATION_STATUS_KEY);
         if (value !== null) {
           setIsRegistered(JSON.parse(value));
         }
-         setLoading(false);
+        setLoading(false);
       }, 1000);
     } catch (error) {
       console.log('Error retrieving registration status ', error);
-    } 
+    }
   }
-
-
 
   if (loading) {
     return <SplashScreen />;
@@ -45,19 +43,21 @@ export default function App() {
 
   return (
     <NavigationContainer>
-     
-        <Stack.Navigator>
-          {isRegistered ? (
+
+      <Stack.Navigator>
+        {isRegistered ? (
+          <>
+            <Stack.Screen name="Home" component={Home}
+              options={{ headerShown: false }} />
             <Stack.Screen name="Profile" component={Profile}
-            options={{
-              headerShown: false, headerBackVisible: true
-            }} />
-          ) : (
-            <Stack.Screen name="Onboarding" component={Onboarding}
-              options={{ headerShown: false }}
+              options={{ headerShown: false }} />
+          </>
+        ) : (
+          <Stack.Screen name="Onboarding" component={Onboarding}
+            options={{ headerShown: false }}
               /*initialParams={{ setIsRegistered }}*/ />
-          )}
-        </Stack.Navigator>
+        )}
+      </Stack.Navigator>
     </NavigationContainer>
   );
 }

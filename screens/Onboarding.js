@@ -5,15 +5,16 @@ import Header from './Header';
 import { useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert, ActivityIndicator } from 'react-native';
-import Profile from './Profile';
+import Home from './Home';
 import OnboardingHeader from './OnboardingHeader';
+import { useNavigation } from '@react-navigation/native';
 
 const REGISTRATION_STATUS_KEY = 'isRegistered';
 const REGISTRATION_FIRST_NAME_KEY = 'firstName';
 const REGISTRATION_LAST_NAME_KEY = 'lastName';
 const REGISTRATION_EMAIL_KEY = 'email';
 
-export default function Onboarding({ navigation }) {
+export default function Onboarding() {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
@@ -22,6 +23,8 @@ export default function Onboarding({ navigation }) {
     const [errors, setErrors] = useState({});
     const [isRegistered, setIsRegistered] = useState(false);
     const [loading, setLoading] = useState(false);
+
+    
 
     const validateEmail = (email) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -92,7 +95,7 @@ export default function Onboarding({ navigation }) {
 
     if (isRegistered) {
         return (
-            <Profile />
+            <Home />
         );
     }
 
