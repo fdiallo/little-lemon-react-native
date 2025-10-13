@@ -20,7 +20,7 @@ const REGISTRATION_FIRST_NAME_KEY = 'firstName';
 const REGISTRATION_LAST_NAME_KEY = 'lastName';
 const REGISTRATION_EMAIL_KEY = 'email';
 
-export default function Profile() {
+export default function Profile({navigation}) {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
@@ -120,7 +120,7 @@ export default function Profile() {
         <KeyboardAvoidingView style={styles.container}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
             <View style={styles.containerHeader}>
-                <CircleButton onPress={() => { }} />
+                <CircleButton onPress={() => {navigation.navigate('Home') }} />
                 <Image
                     resizeMode='contain'
                     style={styles.imgLogo}
