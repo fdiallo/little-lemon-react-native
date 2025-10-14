@@ -41,19 +41,21 @@ export default function App() {
     return <SplashScreen />;
   }
 
+  
+
   return (
     <NavigationContainer>
 
       <Stack.Navigator>
         {isRegistered ? (
           <>
-            <Stack.Screen name="Home" component={Home}
+            <Stack.Screen name='Home' component={Home}
               options={{ headerShown: false }} />
-            <Stack.Screen name="Profile" component={Profile}
+            <Stack.Screen name='Profile' component={Profile}
               options={{ headerShown: false }} />
           </>
         ) : (
-          <Stack.Screen name="Onboarding" component={Onboarding}
+          <Stack.Screen name='Onboarding' component={Onboarding}
             options={{ headerShown: false }}
               /*initialParams={{ setIsRegistered }}*/ />
         )}
@@ -61,6 +63,8 @@ export default function App() {
     </NavigationContainer>
   );
 }
+
+
 
 
 const styles = StyleSheet.create({

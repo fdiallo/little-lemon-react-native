@@ -14,13 +14,17 @@ import * as ImagePicker from 'expo-image-picker';
 import CircleButton from './CircleButton';
 import { TouchableOpacity } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import Home from './Home';
+import { useNavigation } from '@react-navigation/native';
 
 const REGISTRATION_STATUS_KEY = 'isRegistered';
 const REGISTRATION_FIRST_NAME_KEY = 'firstName';
 const REGISTRATION_LAST_NAME_KEY = 'lastName';
 const REGISTRATION_EMAIL_KEY = 'email';
 
-export default function Profile({navigation}) {
+const PROFILE_IMAGE_URI = 'profileImageURI';
+
+export default function Profile() {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
@@ -30,14 +34,32 @@ export default function Profile({navigation}) {
     const [toggleCheckBoxOrder, setToggleCheckBoxOrder] = useState(false);
     const [toggleCheckBoxPassword, setToggleCheckBoxPassword] = useState(false);
     const [toggleCheckBoxSpecial, setToggleCheckBoxSpecial] = useState(false);
-    const [toggleCheckBoxNews, setToggleCheckBoxOrderNews] = useState(false);
+    const [toggleCheckBoxNews, setToggleCheckBoxNews] = useState(false);
     const [isRegistered, setIsRegistered] = useState(true);
     const [loading, setLoading] = useState(false);
     const [image, setImage] = useState(null);
+    const [isMoveToHome, setIsMoveToHome] = useState(false);
+    const navigation = useNavigation();
 
     useEffect(() => {
         retrievedRegistrationStatus();
+        retrievedProfileImageURI();
     }, []);
+
+    const retrievedProfileImageURI = async () => {
+        setLoading(true)
+        try {
+            setTimeout(async () => {
+                const value = await AsyncStorage.getItem(PROFILE_IMAGE_URI);
+                if (value !== null) {
+                    setImage(JSON.parse(value));
+                }
+                setLoading(false);
+            }, 200);
+        } catch (error) {
+            console.log('Error retrieving profile image', error);
+        }
+    }
 
     const retrievedRegistrationStatus = async () => {
 
@@ -70,7 +92,7 @@ export default function Profile({navigation}) {
                 await AsyncStorage.removeItem(REGISTRATION_STATUS_KEY);
                 setIsRegistered(false);
                 setLoading(false);
-            }, 1000);
+            }, 500);
         } catch (error) {
             console.log('Error removing use registration status: ', error);
         }
@@ -92,6 +114,50 @@ export default function Profile({navigation}) {
         );
     }
 
+    const moveToHome = async () => {
+        setLoading(true);
+        try {
+            setTimeout(async () => {
+                setIsMoveToHome(true);
+                setLoading(false);
+            }, 200);
+        } catch (error) {
+            console.log('Error moving to Home screen: ', error);
+        }
+    }
+
+    if (isMoveToHome) {
+        return (<Home />);
+    }
+
+    const saveProfileImageURI = async (profileImg) => {
+        try {
+            const jsonImageValue = JSON.stringify(profileImg);
+
+            await AsyncStorage.setItem(PROFILE_IMAGE_URI, jsonImageValue);
+            //setImage(profileImg);
+
+            //Alert.alert('Success', `Profile Image: ${profileImg}`);
+        } catch (error) {
+            console.log('Error saving registration status: ', error);
+            //Alert.alert('Error', 'Failed to save registration status.');
+        }
+    }
+
+    const removeProfileImage = async () => {
+        //setLoading(true);
+        try {
+            setTimeout(async () => {
+                await AsyncStorage.removeItem(PROFILE_IMAGE_URI);
+                setImage(null);
+                //setLoading(false);
+            }, 200);
+        } catch (error) {
+            console.log('Error removing profile image: ', error);
+        }
+    }
+
+
     const pickImage = async () => {
         // No permissions request is necessary for launching the image library
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -101,16 +167,19 @@ export default function Profile({navigation}) {
             quality: 1,
         });
 
-        console.log(result);
+        console.log('Image Picker Result: ', result);
 
         if (!result.canceled) {
+            console.log('Image Picker URI: ', result.assets[0].uri)
             setImage(result.assets[0].uri);
+            saveProfileImageURI(result.assets[0].uri)
         }
+        console.log('2Image Picker URI: ', image);
     };
 
     const discardCheckboxChanges = () => {
         setToggleCheckBoxOrder(false);
-        setToggleCheckBoxOrderNews(false);
+        setToggleCheckBoxNews(false);
         setToggleCheckBoxPassword(false);
         setToggleCheckBoxSpecial(false);
     }
@@ -120,7 +189,7 @@ export default function Profile({navigation}) {
         <KeyboardAvoidingView style={styles.container}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
             <View style={styles.containerHeader}>
-                <CircleButton onPress={() => {navigation.navigate('Home') }} />
+                <CircleButton onPress={moveToHome} />
                 <Image
                     resizeMode='contain'
                     style={styles.imgLogo}
@@ -129,10 +198,8 @@ export default function Profile({navigation}) {
                     resizeMode='contain'
                     style={styles.imgProfile}
                     source={{ uri: image }} />
-
             </View>
             <ScrollView keyboardDismissMode='on-drag'  >
-
                 <View style={styles.contentContainer}>
                     <Text style={styles.persoInfo}>Personal Information</Text>
                     <Text style={styles.avatar}>Avatar</Text>
@@ -141,7 +208,7 @@ export default function Profile({navigation}) {
                         <Pressable title="Pic" onPress={pickImage} >
                             {image !== null ? (<Image source={{ uri: image }} style={styles.img} />) :
                                 (<TouchableOpacity style={styles.takeProfilePic} onPress={pickImage} >
-                                    <Ionicons name='camera'  size={48} color="#FFFFFF" />
+                                    <Ionicons name='camera' size={48} color="#FFFFFF" />
                                 </TouchableOpacity>)}
                         </Pressable>
 
@@ -153,7 +220,7 @@ export default function Profile({navigation}) {
                         </Pressable>
                         <Pressable
                             style={styles.buttonRemove}
-                            onPress={() => {setImage(null)}}
+                            onPress={removeProfileImage}
                             disabled={isButtonActive}>
                             <Text style={styles.textButtonRemove}>Remove</Text>
                         </Pressable>
@@ -220,7 +287,7 @@ export default function Profile({navigation}) {
                         <Checkbox
                             disabled={false}
                             value={toggleCheckBoxNews}
-                            onValueChange={(newValue) => setToggleCheckBoxOrderNews(newValue)}
+                            onValueChange={(newValue) => setToggleCheckBoxNews(newValue)}
                             tintColor={{ true: '#495E57', false: '#999' }}
                         />
                         <Text style={styles.checkBoxText}>Newsletter</Text>
@@ -236,7 +303,7 @@ export default function Profile({navigation}) {
                         <Text style={styles.discardChangesTxt}>Discard changes</Text>
                     </Pressable>
                     <Pressable
-                        style={styles.buttomSaveChanges}
+                        style={styles.buttonSaveChanges}
                         onPress={() => { }}
                         disabled={isButtonActive}
                     >
@@ -244,12 +311,13 @@ export default function Profile({navigation}) {
                     </Pressable>
                 </View>
 
+
+                <Pressable
+                    style={styles.bottomContainer}
+                    onPress={logout}>
+                    <Text style={styles.button}>Log out</Text>
+                </Pressable>
             </ScrollView>
-            <Pressable
-                style={styles.bottomContainer}
-                onPress={logout}>
-                <Text style={styles.button}>Log out</Text>
-            </Pressable>
         </KeyboardAvoidingView >
 
     );
@@ -313,7 +381,6 @@ const styles = StyleSheet.create({
 
     },
     buttonRemove: {
-        //marginRight: 24,
         borderWidth: 1,
     },
     textButtonChange: {
@@ -430,22 +497,23 @@ const styles = StyleSheet.create({
         borderRadius: 8,
     },
     bottomContainer: {
-        position: 'absolute',
-        bottom: 40,
-        left: 16,
-        right: 16,
-        height: 36,
-        
+
+         bottom: 24,
+        left: 0,
+        right: 0,
+        marginHorizontal: 16,
+        marginTop: 72,
+
     },
     button: {
-        
+
         textAlignVertical: 'center',
         textAlign: 'center',
         height: 40,
         backgroundColor: '#F4CE14',
         fontSize: 16,
         borderRadius: 8,
-    
+
         fontWeight: 'bold',
         borderWidth: 1,
         borderRadius: 8,
