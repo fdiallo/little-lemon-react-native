@@ -3,7 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import {
     View, StyleSheet, Text, TextInput,
     Pressable, KeyboardAvoidingView,
-    ScrollView, Platform, Image, ActivityIndicator, Button,
+    ScrollView, Platform, Image, ActivityIndicator, Button, Alert,
 } from 'react-native';
 import Header from './Header';
 import { useState, useEffect, } from 'react';
@@ -23,6 +23,12 @@ const REGISTRATION_LAST_NAME_KEY = 'lastName';
 const REGISTRATION_EMAIL_KEY = 'email';
 
 const PROFILE_IMAGE_URI = 'profileImageURI';
+const EMAIL = 'email';
+const PHONE_NUMBER = 'phoneNumber';
+const TOOGLE_CHECKBOX_ORDER = 'toggleCheckBoxOrder';
+const TOOGLE_CHECKBOX_PASSWORD = 'toggleCheckBoxPassword';
+const TOOGLE_CHECKBOX_SPECIAL = 'toggleCheckBoxSpecial';
+const TOOGLE_CHECKBOX_NEWS = 'toggleCheckBoxNews';
 
 export default function Profile() {
     const [firstName, setFirstName] = useState('');
@@ -44,7 +50,40 @@ export default function Profile() {
     useEffect(() => {
         retrievedRegistrationStatus();
         retrievedProfileImageURI();
+        retrieveEmailNotificationsPreferences();
     }, []);
+
+    const retrieveEmailNotificationsPreferences = async () => {
+        
+        try {
+            setTimeout(async () => {
+                const phoneNumberValue = await AsyncStorage.getItem(PHONE_NUMBER);
+                const toggleCheckBoxOrderValue = await AsyncStorage.getItem(TOOGLE_CHECKBOX_ORDER);
+                const toggleCheckBoxPasswordValue = await AsyncStorage.getItem(TOOGLE_CHECKBOX_PASSWORD);
+                const toggleCheckBoxSpecialValue = await AsyncStorage.getItem(TOOGLE_CHECKBOX_SPECIAL);
+                const toggleCheckBoxNewsValue = await AsyncStorage.getItem(TOOGLE_CHECKBOX_NEWS);
+                
+                if (phoneNumberValue !== null) {
+                    setPhoneNumber(JSON.parse(phoneNumberValue));
+                }
+                if (toggleCheckBoxOrderValue !== null) {
+                    setToggleCheckBoxOrder(JSON.parse(toggleCheckBoxOrderValue));
+                }
+                if (toggleCheckBoxPasswordValue !== null) {
+                    setToggleCheckBoxPassword(JSON.parse(toggleCheckBoxPasswordValue));
+                }
+                if (toggleCheckBoxSpecialValue !== null) {
+                    setToggleCheckBoxSpecial(JSON.parse(toggleCheckBoxSpecialValue));
+                }
+                if (toggleCheckBoxNewsValue !== null) {
+                    setToggleCheckBoxNews(JSON.parse(toggleCheckBoxNewsValue));
+                }
+               
+            }, 200);
+        } catch (error) {
+            console.log('Error retrieving profile image', error);
+        }
+    }
 
     const retrievedProfileImageURI = async () => {
         setLoading(true)
@@ -184,6 +223,28 @@ export default function Profile() {
         setToggleCheckBoxSpecial(false);
     }
 
+    const saveChanges = async () => {
+        try {
+            const jsonPhoneValue = JSON.stringify(phoneNumber);
+            const jsonOrderValue = JSON.stringify(toggleCheckBoxOrder);
+            const jsonPasswordValue = JSON.stringify(toggleCheckBoxPassword);
+            const jsonSpecialValue = JSON.stringify(toggleCheckBoxSpecial);
+            const jsonNewsValue = JSON.stringify(toggleCheckBoxNews);
+
+            await AsyncStorage.setItem(PHONE_NUMBER, jsonPhoneValue);
+            await AsyncStorage.setItem(TOOGLE_CHECKBOX_ORDER, jsonOrderValue);
+            await AsyncStorage.setItem(TOOGLE_CHECKBOX_PASSWORD, jsonPasswordValue);
+            await AsyncStorage.setItem(TOOGLE_CHECKBOX_SPECIAL, jsonSpecialValue);
+            await AsyncStorage.setItem(TOOGLE_CHECKBOX_NEWS, jsonNewsValue);
+
+            Alert.alert('Success Preferences Saved!');
+            
+        } catch (error) {
+            console.log('Error saving registration status: ', error);
+            //Alert.alert('Error', 'Failed to save changes.');
+        }
+    }
+
     return (
 
         <KeyboardAvoidingView style={styles.container}
@@ -304,7 +365,7 @@ export default function Profile() {
                     </Pressable>
                     <Pressable
                         style={styles.buttonSaveChanges}
-                        onPress={() => { }}
+                        onPress={saveChanges}
                         disabled={isButtonActive}
                     >
                         <Text style={styles.saveChangesTxt}>Save changes</Text>
