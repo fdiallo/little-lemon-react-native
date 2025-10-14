@@ -12,7 +12,6 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { Searchbar } from 'react-native-paper';
 import debounce from 'lodash.debounce';
 import Filters from '../components/Filters';
-import { useNavigation } from '@react-navigation/native';
 import {
     createTable,
     getMenuItems,
@@ -22,22 +21,27 @@ import {
 } from '../database';
 import { getSectionListData, useUpdateEffect } from '../utils';
 import { ImageStore } from 'react-native';
+import Profile from './Profile';
 
 const API_URL = 'https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json';
 const imageUrl = 'https://github.com/Meta-Mobile-Developer-PC/Working-With-Data-API/blob/main/images/';
 const sections = ['starters', 'mains', 'desserts', 'drinks'];
+
+const PROFILE_IMAGE_URI = 'profileImageURI';
   
 
 export default function Home() {
 
-    //const [profileImage, setProfileImage] = useState(null);
+    const [profileImage, setProfileImage] = useState(null);
     const [searchBarText, setSearchBarText] = useState('');
     const [query, setQuery] = useState('');
     const [data, setData] = useState([]);
     const [filterSelections, setFilterSelections] = useState(
         sections.map(() => false)
     );
-    const navigation = useNavigation();
+    const [isMoveToProfile, setIsMoveToProfile] = useState(false);
+    const [loading, setLoading] = useState(false);
+
 
     const fetchData = async () => {
         try {
@@ -56,6 +60,7 @@ export default function Home() {
             //console.log('Use Effect...');
             //console.log(`${imageUrl}${imagestring}?raw=true`);
             try {
+                await retrievedProfileImageURI();
                 await initializeDB();
                 await createTable();
                 let menuItems = await getMenuItems();
@@ -142,6 +147,47 @@ useUpdateEffect(() => {
     const Separator = () => <View style={styles.sectionLineSeparator}></View>;
 
 
+  const retrievedProfileImageURI = async () => {
+    setLoading(true)
+    try {
+      setTimeout(async () => {
+        const value = await AsyncStorage.getItem(PROFILE_IMAGE_URI);
+        if (value !== null) {
+          setProfileImage(JSON.parse(value));
+        }
+        setLoading(false);
+      }, 200);
+    } catch (error) {
+      console.log('Error retrieving profile image', error);
+    }
+  }
+
+    const moveToProfile = async () => {
+        setLoading(true);
+        try {
+            setTimeout(async () => {
+                setIsMoveToProfile(true);
+                setLoading(false);
+            }, 200);
+        } catch (error) {
+            console.log('Error removing use registration status: ', error);
+        }
+    }
+
+    if (loading) {
+    
+            return (
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                    <ActivityIndicator size="large" color="#0000ff" />
+                    <Text>Loagging out...</Text>
+                </View>
+            );
+        }
+
+    if (isMoveToProfile) {
+        return (<Profile />);
+    }
+    
     return (
 
         <View style={styles.container}
@@ -152,12 +198,12 @@ useUpdateEffect(() => {
                     resizeMode='contain'
                     style={styles.imgLogo}
                     source={require('../img/little_lemon_logo.png')} />
-                <Pressable onPress={() => navigation.navigate('Profile')}>
-                    <Image
-                        resizeMode='contain'
-                        style={styles.imgProfile}
-                        source={require('../img/profile.png')} />
-                </Pressable>
+                <Pressable title="Pic" onPress={moveToProfile} >
+                            {profileImage !== null ? (<Image source={{ uri: profileImage }} style={styles.img} />) :
+                                (<TouchableOpacity style={styles.takeProfilePic} onPress={moveToProfile} >
+                                    <Ionicons name='camera'  size={48} color="#FF00000" />
+                                </TouchableOpacity>)}
+                        </Pressable>
             </View>
             <View style={styles.banner}>
                 <Text style={styles.titleText}>Let us get to know you</Text>

@@ -1,13 +1,10 @@
 import * as React from 'react'
-import { StatusBar } from 'expo-status-bar';
-import { View, StyleSheet, Text, TextInput, Pressable, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
-import Header from './Header';
+import { View, StyleSheet, Text, TextInput, Pressable, KeyboardAvoidingView, ScrollView, Platform, Image } from 'react-native';
 import { useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert, ActivityIndicator } from 'react-native';
 import Home from './Home';
 import OnboardingHeader from './OnboardingHeader';
-import { useNavigation } from '@react-navigation/native';
 
 const REGISTRATION_STATUS_KEY = 'isRegistered';
 const REGISTRATION_FIRST_NAME_KEY = 'firstName';
@@ -23,8 +20,6 @@ export default function Onboarding() {
     const [errors, setErrors] = useState({});
     const [isRegistered, setIsRegistered] = useState(false);
     const [loading, setLoading] = useState(false);
-
-    
 
     const validateEmail = (email) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -75,7 +70,6 @@ export default function Onboarding() {
             setLoading(true);
             setTimeout(async () => {
                 await saveRegistrationStatus(true, firstName, lastName, email);
-                //await saveUserRegistrationDetails();
                 setLoading(false);
             }, 500);
 
@@ -101,8 +95,15 @@ export default function Onboarding() {
 
     return (
         <KeyboardAvoidingView style={styles.container}
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-            <OnboardingHeader />
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+            <View style={styles.headerRow}>
+                <Image
+                    resizeMode='contain'
+                    style={styles.headerImg}
+                    source={require('../img/little_lemon_logo.png')} />
+
+            </View>
             <ScrollView keyboardDismissMode='on-drag'  >
                 <View style={styles.heading}>
                     <Text style={styles.headingText}>Let us get to know you</Text>
@@ -115,7 +116,7 @@ export default function Onboarding() {
                         value={firstName}
                         onChangeText={setFirstName}
                         clearButtonMode='always'
-                        placeholder='Enter your First Name'/>
+                        placeholder='Enter your First Name' />
                     {errors.firstName && <Text style={{ color: 'red' }}>{errors.firstName}</Text>}
                     <Text style={styles.text}>Last Name</Text>
                     <TextInput
@@ -123,7 +124,7 @@ export default function Onboarding() {
                         value={lastName}
                         onChangeText={setLastName}
                         clearButtonMode='always'
-                        placeholder='Enter your Last Name'/>
+                        placeholder='Enter your Last Name' />
                     {errors.lastName && <Text style={{ color: 'red' }}>{errors.lastName}</Text>}
                     <Text style={styles.text}>Email</Text>
                     <TextInput
@@ -132,17 +133,18 @@ export default function Onboarding() {
                         onChangeText={setEmail}
                         keyboardType='email-address'
                         clearButtonMode='always'
-                        placeholder='Enter you email'/>
+                        placeholder='Enter you email' />
                     {errors.email && <Text style={{ color: 'red' }}>{errors.email}</Text>}
                 </View>
-            </ScrollView>
+          
 
-            <Pressable
-                style={styles.bottomContainer}
+            <Pressable style={styles.bottomContainer}
                 onPress={handleRegistration}
                 disabled={isButtonActive}>
                 <Text style={styles.button}>Next</Text>
             </Pressable>
+
+  </ScrollView>
         </KeyboardAvoidingView >
     );
 }
@@ -151,15 +153,21 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-    main: {
-        flex: 1,
-        paddingBottom: 70,
+    headerRow: {
+        alignItems: 'center',
     },
+    headerImg: {
+        height: 100,
+        width: 200,
+
+    },
+    
     heading: {
         height: 100,
         backgroundColor: '#495E57',
+        justifyContent: 'center',
         alignItems: 'center',
-        justifyContent: 'center'
+        
     },
     headingText: {
         fontSize: 24,
@@ -189,11 +197,14 @@ const styles = StyleSheet.create({
         height: 48,
     },
     bottomContainer: {
-        position: 'absolute',
-        bottom: 40,
-        left: 16,
-        right: 16,
+       
+        bottom: 24,
+        left: 0,
+        right: 0,
+        marginHorizontal: 16,
+        marginTop: 72,
     },
+
     button: {
         height: 48,
         textAlign: 'center',
