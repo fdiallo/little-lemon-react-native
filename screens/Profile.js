@@ -5,7 +5,6 @@ import {
     Pressable, KeyboardAvoidingView,
     ScrollView, Platform, Image, ActivityIndicator, Button, Alert,
 } from 'react-native';
-import Header from './Header';
 import { useState, useEffect, } from 'react';
 import Checkbox from 'expo-checkbox';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -78,7 +77,6 @@ export default function Profile() {
                 if (toggleCheckBoxNewsValue !== null) {
                     setToggleCheckBoxNews(JSON.parse(toggleCheckBoxNewsValue));
                 }
-               
             }, 200);
         } catch (error) {
             console.log('Error retrieving profile image', error);
@@ -101,14 +99,11 @@ export default function Profile() {
     }
 
     const retrievedRegistrationStatus = async () => {
-
         try {
-            // setTimeout(async () => {
             const first_name = await AsyncStorage.getItem(REGISTRATION_FIRST_NAME_KEY);
             const last_name = await AsyncStorage.getItem(REGISTRATION_LAST_NAME_KEY);
             const _email = await AsyncStorage.getItem(REGISTRATION_EMAIL_KEY);
             if (first_name !== null) {
-                //console.log('User First Name: ', first_name);
                 setFirstName(JSON.parse(first_name));
             }
             if (last_name !== null) {
@@ -117,8 +112,6 @@ export default function Profile() {
             if (_email !== null) {
                 setEmail(JSON.parse(_email));
             }
-
-            //}, 1000);
         } catch (error) {
             console.log('Error retrieving registration status ', error);
         }
@@ -144,11 +137,9 @@ export default function Profile() {
     }
 
     if (loading) {
-
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                 <ActivityIndicator size="large" color="#0000ff" />
-                <Text>Loagging out...</Text>
             </View>
         );
     }
@@ -172,24 +163,17 @@ export default function Profile() {
     const saveProfileImageURI = async (profileImg) => {
         try {
             const jsonImageValue = JSON.stringify(profileImg);
-
             await AsyncStorage.setItem(PROFILE_IMAGE_URI, jsonImageValue);
-            //setImage(profileImg);
-
-            //Alert.alert('Success', `Profile Image: ${profileImg}`);
         } catch (error) {
             console.log('Error saving registration status: ', error);
-            //Alert.alert('Error', 'Failed to save registration status.');
         }
     }
 
     const removeProfileImage = async () => {
-        //setLoading(true);
         try {
             setTimeout(async () => {
                 await AsyncStorage.removeItem(PROFILE_IMAGE_URI);
                 setImage(null);
-                //setLoading(false);
             }, 200);
         } catch (error) {
             console.log('Error removing profile image: ', error);
@@ -241,7 +225,6 @@ export default function Profile() {
             
         } catch (error) {
             console.log('Error saving registration status: ', error);
-            //Alert.alert('Error', 'Failed to save changes.');
         }
     }
 

@@ -2,9 +2,8 @@ import * as React from 'react'
 import { View, StyleSheet, Text, TextInput, Pressable, KeyboardAvoidingView, ScrollView, Platform, Image } from 'react-native';
 import { useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Alert, ActivityIndicator } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 import Home from './Home';
-import OnboardingHeader from './OnboardingHeader';
 
 const REGISTRATION_STATUS_KEY = 'isRegistered';
 const REGISTRATION_FIRST_NAME_KEY = 'firstName';
@@ -15,7 +14,6 @@ export default function Onboarding() {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
-    const [userRegistrationDetails, setUserRegistrationDetails] = useState([]);
     const [isButtonActive, setIsButtonActive] = useState(false);
     const [errors, setErrors] = useState({});
     const [isRegistered, setIsRegistered] = useState(false);
@@ -41,10 +39,8 @@ export default function Onboarding() {
             setFirstName(firstName);
             setLastName(lastName);
             setEmail(email);
-            //Alert.alert('Success', `Registration status saved: ${status}`);
         } catch (error) {
             console.log('Error saving registration status: ', error);
-            //Alert.alert('Error', 'Failed to save registration status.');
         }
     }
 
@@ -66,7 +62,6 @@ export default function Onboarding() {
         setErrors(newErrors);
 
         if (Object.keys(newErrors).length === 0) {
-            // Form is valid, proceed with submission
             setLoading(true);
             setTimeout(async () => {
                 await saveRegistrationStatus(true, firstName, lastName, email);
