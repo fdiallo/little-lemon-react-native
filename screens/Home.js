@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
     imgBody: {
         width: 150,
         height: 150,
-        borderRadius: 8,
+        borderRadius: 16,
     },
 
     img: {
@@ -359,6 +359,7 @@ const styles = StyleSheet.create({
         height: 100,
         width: 100,
         marginRight: 8,
+        borderRadius: 16,
     },
     sectionHeader: {
         fontSize: 24,
