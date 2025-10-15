@@ -20,7 +20,6 @@ import {
     initializeDB,
 } from '../database';
 import { getSectionListData, useUpdateEffect } from '../utils';
-import { ImageStore } from 'react-native';
 import Profile from './Profile';
 
 const API_URL = 'https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json';
@@ -28,7 +27,7 @@ const imageUrl = 'https://github.com/Meta-Mobile-Developer-PC/Working-With-Data-
 const sections = ['starters', 'mains', 'desserts', 'drinks'];
 
 const PROFILE_IMAGE_URI = 'profileImageURI';
-  
+
 
 export default function Home() {
 
@@ -57,14 +56,11 @@ export default function Home() {
 
     useEffect(() => {
         (async () => {
-            //console.log('Use Effect...');
-            //console.log(`${imageUrl}${imagestring}?raw=true`);
             try {
                 await retrievedProfileImageURI();
                 await initializeDB();
                 await createTable();
                 let menuItems = await getMenuItems();
-                //console.log('MenuItems: ', menuItems);
 
                 // The application only fetches the menu data once from a remote URL
                 // and then stores it into a SQLite database.
@@ -72,11 +68,9 @@ export default function Home() {
 
                 if (!menuItems.length) {
                     const menuItems = await fetchData();
-                    //console.log('Data Fetched: ', menuItems);
                     saveMenuItems(menuItems);
                 }
                 const sectionListData = getSectionListData(menuItems);
-                //console.log('SectionListData: ', sectionListData);
                 setData(sectionListData);
             } catch (e) {
                 Alert.alert(e.message);
@@ -84,27 +78,27 @@ export default function Home() {
         })();
     }, []);
 
-useUpdateEffect(() => {
-    (async () => {
-      const activeCategories = sections.filter((s, i) => {
-        // If all filters are deselected, all categories are active
-        if (filterSelections.every((item) => item === false)) {
-          return true;
-        }
-        return filterSelections[i];
-      });
-      try {
-        const menuItems = await filterByQueryAndCategories(
-          query,
-          activeCategories
-        );
-        const sectionListData = getSectionListData(menuItems);
-        setData(sectionListData);
-      } catch (e) {
-        Alert.alert(e.message);
-      }
-    })();
-  }, [filterSelections, query]);
+    useUpdateEffect(() => {
+        (async () => {
+            const activeCategories = sections.filter((s, i) => {
+                // If all filters are deselected, all categories are active
+                if (filterSelections.every((item) => item === false)) {
+                    return true;
+                }
+                return filterSelections[i];
+            });
+            try {
+                const menuItems = await filterByQueryAndCategories(
+                    query,
+                    activeCategories
+                );
+                const sectionListData = getSectionListData(menuItems);
+                setData(sectionListData);
+            } catch (e) {
+                Alert.alert(e.message);
+            }
+        })();
+    }, [filterSelections, query]);
 
     const lookup = useCallback((q) => {
         setQuery(q);
@@ -130,7 +124,7 @@ useUpdateEffect(() => {
                 <View style={styles.columnText}>
                     <Text style={styles.itemPriceAndNameRow}>{name}</Text>
                     <Text style={styles.itemDesc}>{description}</Text>
-                    <Text style={styles.itemPriceAndNameRow}>{price}</Text>
+                    <Text style={styles.itemPriceAndNameRow}>${price}</Text>
                 </View>
                 <Image style={styles.menuImage} source={{ uri: `${imageUrl}${image}?raw=true` }} />
             </View>
@@ -147,20 +141,20 @@ useUpdateEffect(() => {
     const Separator = () => <View style={styles.sectionLineSeparator}></View>;
 
 
-  const retrievedProfileImageURI = async () => {
-    setLoading(true)
-    try {
-      setTimeout(async () => {
-        const value = await AsyncStorage.getItem(PROFILE_IMAGE_URI);
-        if (value !== null) {
-          setProfileImage(JSON.parse(value));
+    const retrievedProfileImageURI = async () => {
+        setLoading(true)
+        try {
+            setTimeout(async () => {
+                const value = await AsyncStorage.getItem(PROFILE_IMAGE_URI);
+                if (value !== null) {
+                    setProfileImage(JSON.parse(value));
+                }
+                setLoading(false);
+            }, 200);
+        } catch (error) {
+            console.log('Error retrieving profile image', error);
         }
-        setLoading(false);
-      }, 200);
-    } catch (error) {
-      console.log('Error retrieving profile image', error);
     }
-  }
 
     const moveToProfile = async () => {
         setLoading(true);
@@ -175,19 +169,17 @@ useUpdateEffect(() => {
     }
 
     if (loading) {
-    
-            return (
-                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                    <ActivityIndicator size="large" color="#0000ff" />
-                    <Text>Loagging out...</Text>
-                </View>
-            );
-        }
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <ActivityIndicator size="large" color="#0000ff" />
+            </View>
+        );
+    }
 
     if (isMoveToProfile) {
         return (<Profile />);
     }
-    
+
     return (
 
         <View style={styles.container}
@@ -199,11 +191,11 @@ useUpdateEffect(() => {
                     style={styles.imgLogo}
                     source={require('../img/little_lemon_logo.png')} />
                 <Pressable title="Pic" onPress={moveToProfile} >
-                            {profileImage !== null ? (<Image source={{ uri: profileImage }} style={styles.img} />) :
-                                (<TouchableOpacity style={styles.takeProfilePic} onPress={moveToProfile} >
-                                    <Ionicons name='camera'  size={48} color="#FF00000" />
-                                </TouchableOpacity>)}
-                        </Pressable>
+                    {profileImage !== null ? (<Image source={{ uri: profileImage }} style={styles.img} />) :
+                        (<TouchableOpacity style={styles.takeProfilePic} onPress={moveToProfile} >
+                            <Ionicons name='camera' size={48} color="#FF00000" />
+                        </TouchableOpacity>)}
+                </Pressable>
             </View>
             <View style={styles.banner}>
                 <Text style={styles.titleText}>Let us get to know you</Text>
@@ -379,8 +371,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#495E57',
         marginVertical: 8,
     },
-
-
 
 
     contentContainer: {

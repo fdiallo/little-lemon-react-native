@@ -1,14 +1,12 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import Onboarding from './screens/Onboarding';
-import Header from './screens/Header';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useEffect, useState } from 'react';
 import Profile from './screens/Profile';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SplashScreen from './screens/SplashScreen';
-import OnboardingHeader from './screens/OnboardingHeader';
 import Home from './screens/Home';
 
 const Stack = createNativeStackNavigator();
