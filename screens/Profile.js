@@ -130,6 +130,25 @@ export default function Profile() {
         }
     }
 
+    const deleteAccount = async () => {
+        setLoading(true);
+        try {
+            setTimeout(async () => {
+                await AsyncStorage.removeItem(REGISTRATION_STATUS_KEY);
+                await AsyncStorage.removeItem(PHONE_NUMBER);
+                await AsyncStorage.setItem(TOOGLE_CHECKBOX_ORDER, "false");
+                await AsyncStorage.setItem(TOOGLE_CHECKBOX_PASSWORD, "false");
+                await AsyncStorage.setItem(TOOGLE_CHECKBOX_SPECIAL, "false");
+                await AsyncStorage.setItem(TOOGLE_CHECKBOX_NEWS, "false");
+                await AsyncStorage.setItem(PROFILE_IMAGE_URI, "null");
+                setIsRegistered(false);
+                setLoading(false);
+            }, 500);
+        } catch (error) {
+            console.log('Error removing use registration status: ', error);
+        }
+    }
+
     if (!isRegistered) {
         return (
             <Onboarding />
@@ -360,6 +379,12 @@ export default function Profile() {
                     style={styles.bottomContainer}
                     onPress={logout}>
                     <Text style={styles.button}>Log out</Text>
+                </Pressable>
+
+                <Pressable
+                    style={styles.bottomContainer}
+                    onPress={deleteAccount}>
+                    <Text style={styles.button}>Delete Account</Text>
                 </Pressable>
             </ScrollView>
         </KeyboardAvoidingView >
